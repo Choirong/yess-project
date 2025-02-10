@@ -16,17 +16,17 @@ const userSchema = new mongoose.Schema({
 });
 
 // 사용자 찾기 메서드
-userSchema.statics.findByEmail = function(email) {
+userSchema.statics.findByEmail = function (email) {
   return this.findOne({ email });
 };
 
 // 사용자 생성 메서드
-userSchema.statics.createUser = function(email, name) {
+userSchema.statics.createUser = function (email, name) {
   return this.create({ email, name });
 };
 
 // 사용자 이름 업데이트 메서드
-userSchema.statics.updateName = function(email, name) {
+userSchema.statics.updateName = function (email, name) {
   return this.findOneAndUpdate({ email }, { name }, { new: true });
 };
 
