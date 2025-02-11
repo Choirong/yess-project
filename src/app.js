@@ -3,7 +3,6 @@ const dotenv = require("dotenv");
 const path = require("path");
 
 dotenv.config({ path: path.join(__dirname, "../.env") });
-console.log('JWT_SECRET:', process.env.JWT_SECRET);
 
 const mongoose = require("mongoose");
 const authRoutes = require('./routes/auth');
