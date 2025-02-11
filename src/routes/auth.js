@@ -5,15 +5,19 @@ const User = require("../models/User");
 
 const router = express.Router();
 
-const SECRET_KEY = process.env.local.JWT_SECRET;
+const SECRET_KEY = process.env.JWT_SECRET;
 
 router.post("/register", async (req, res) => {
     const { email, name } = req.body;
     try {
         let user = await User.findByEmail(email);
-        if (user) {
+        // console.log("User found:", user); // 로그 확인
+
+        if (user !== null) {
+            console.log("User exists. Updating user.");
             user = await User.updateName(email, name);
         } else {
+            console.log("User does not exist. Creating new user.");
             user = await User.createUser(email, name);
         }
 

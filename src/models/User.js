@@ -21,8 +21,15 @@ userSchema.statics.findByEmail = function (email) {
 };
 
 // 사용자 생성 메서드
-userSchema.statics.createUser = function (email, name) {
-  return this.create({ email, name });
+userSchema.statics.createUser = async function (email, name) {
+  try {
+    const user = new this({ email, name });
+    await user.save();
+    return user;
+  } catch (error) {
+    console.error('유저 생성 에러: ', error);
+    throw new Error('유저 생성에 실패하였습니다.')
+  }
 };
 
 // 사용자 이름 업데이트 메서드

@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 
 // 문서 변경 API
 router.post('/update', async (req, res) => {
-    const { version, content } = req.body;
+    const { content, version } = req.body;
     try {
         const doc = await Doc.findOne();
 
