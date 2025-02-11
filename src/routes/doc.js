@@ -1,5 +1,6 @@
 const express = require('express');
 const Doc = require('../models/Doc');
+const { applyChanges, adjustChangesForConflict } = require('../utils/operationalTransform');
 
 const router = express.Router();
 
@@ -18,7 +19,7 @@ router.get('/', async (req, res) => {
 
 // 문서 변경 API
 router.post('/update', async (req, res) => {
-    const { content, version } = req.body;
+    const { version, changes } = req.body;
     try {
         const doc = await Doc.findOne();
 
@@ -26,18 +27,23 @@ router.post('/update', async (req, res) => {
             return res.status(404).json({ message: '문서를 찾을 수 없습니다.' });
         }
 
-        // 충돌 처리: 클라이언트가 보낸 버전이 서버의 최신 버전보다 낮은 경우
+        // 충돌 처리: 클라이언트 버전이 서버 버전보다 낮은 경우
         if (version < doc.version) {
-            return res.status(409).json({ message: '버전 충돌이 발생했습니다.' });
+            const adjustedChanges = adjustChangesForConflict(doc.content, doc.version, version, changes);
+            doc.content = applyChanges(doc.content, adjustedChanges);
+        } else {
+            doc.content = applyChanges(doc.content, changes);
         }
 
-        // 문서 업데이트
-        doc.content = content;
+        // 버전 증가 및 저장
         doc.version += 1;
+        console.log('Updated content:', doc.content);
+        console.log('Updated version:', doc.version);
         await doc.save();
 
         res.json({ message: '문서가 성공적으로 업데이트되었습니다.', doc });
     } catch (error) {
+        console.error('Error updating document:', error); // 에러 로그
         res.status(500).json({ error: '문서를 업데이트하는 중 오류가 발생했습니다.' });
     }
 });
